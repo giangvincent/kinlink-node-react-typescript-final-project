@@ -1,35 +1,11 @@
-import type { Gender } from "../contracts.js";
+import { prisma } from "../config/database.js";
+import type { Person as PrismaPerson } from "../../generated/prisma/client.js";
 
-export interface Person {
-  id: string;
-  familyId: string;
-  displayName: string;
-  gender: Gender;
-  birthDate: string | null;
-  deathDate: string | null;
-}
-
-// The Model layer. Lesson 02 replaces this array with Prisma queries --
-// and nothing above this file will need to change.
-const people: Person[] = [
-  {
-    id: "p_1",
-    familyId: "f_1",
-    displayName: "Nguyễn Văn An",
-    gender: "male",
-    birthDate: "1948-03-02",
-    deathDate: null,
-  },
-  {
-    id: "p_2",
-    familyId: "f_1",
-    displayName: "Trần Thị Bình",
-    gender: "female",
-    birthDate: "1952-07-19",
-    deathDate: null,
-  },
-];
+// The model layer re-exports the ORM's type, so no layer above it has to know
+// that Prisma exists. If we swap Prisma for something else in two years, this
+// import and these query bodies are the entire blast radius.
+export type Person = PrismaPerson;
 
 export async function findAll(): Promise<Person[]> {
-  return people;
+  return prisma.person.findMany({ orderBy: { createdAt: "asc" } });
 }

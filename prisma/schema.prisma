@@ -1,0 +1,42 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../server/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+enum Gender {
+  male
+  female
+  other
+  unknown
+}
+
+model Family {
+  id        String   @id @default(uuid())
+  slug      String   @unique
+  name      String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  people Person[]
+
+  @@map("families")
+}
+
+model Person {
+  id          String    @id @default(uuid())
+  familyId    String    @map("family_id")
+  displayName String    @map("display_name")
+  gender      Gender
+  birthDate   DateTime? @map("birth_date") @db.Date
+  deathDate   DateTime? @map("death_date") @db.Date
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  family Family @relation(fields: [familyId], references: [id], onDelete: Cascade)
+
+  @@index([familyId])
+  @@map("people")
+}

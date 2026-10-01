@@ -1,0 +1,17 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: kinlink-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: kinlink
+      MYSQL_USER: kinlink
+      MYSQL_PASSWORD: kinlink
+    ports:
+      - "3306:3306"
+    volumes:
+      - kinlink-mysql-data:/var/lib/mysql
+
+volumes:
+  kinlink-mysql-data:

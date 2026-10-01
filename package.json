@@ -10,9 +10,17 @@
     "build:client": "vite build",
     "build:server": "tsc",
     "start": "node dist/server/src/server.js",
-    "typecheck": "tsc --noEmit && tsc -p client/tsconfig.json --noEmit"
+    "typecheck": "tsc --noEmit && tsc -p client/tsconfig.json --noEmit",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "db:migrate": "prisma migrate dev",
+    "db:studio": "prisma studio",
+    "db:seed": "tsx server/src/scripts/seed.ts"
   },
   "dependencies": {
+    "@prisma/adapter-mariadb": "^7.10.0",
+    "@prisma/client": "^7.10.0",
+    "dotenv": "^18.0.4",
     "express": "^5.2.1",
     "react": "^19.3.0",
     "react-dom": "^19.3.0"
@@ -24,8 +32,14 @@
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.1",
     "concurrently": "^10.0.5",
+    "prisma": "^7.10.0",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
     "vite": "^8.3.1"
+  },
+  "overrides": {
+    "deepmerge-ts": ">=8.0.0",
+    "mariadb": ">=3.4.6",
+    "mysql2": ">=3.23.1"
   }
 }
