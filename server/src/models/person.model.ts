@@ -1,11 +1,14 @@
 import { prisma } from "../config/database.js";
 import type { Person as PrismaPerson } from "../../generated/prisma/client.js";
 
-// The model layer re-exports the ORM's type, so no layer above it has to know
-// that Prisma exists. If we swap Prisma for something else in two years, this
-// import and these query bodies are the entire blast radius.
 export type Person = PrismaPerson;
 
-export async function findAll(): Promise<Person[]> {
-  return prisma.person.findMany({ orderBy: { createdAt: "asc" } });
+// familyId is now a required argument. There is no way to call this
+// function without saying whose rows you want, which is what makes the
+// isolation bug impossible to introduce by accident.
+export async function findByFamily(familyId: string): Promise<Person[]> {
+  return prisma.person.findMany({
+    where: { familyId },
+    orderBy: { createdAt: "asc" },
+  });
 }

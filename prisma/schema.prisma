@@ -33,7 +33,7 @@ model Person {
   birthDate   DateTime? @map("birth_date") @db.Date
   deathDate   DateTime? @map("death_date") @db.Date
   createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime  @updatedAt @map("updated_at")
+  updatedAt   DateTime  @default(now()) @map("updated_at")
 
   family Family @relation(fields: [familyId], references: [id], onDelete: Cascade)
 
