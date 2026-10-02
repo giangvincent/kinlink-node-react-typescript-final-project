@@ -1,20 +1,18 @@
 import type { NextFunction, Request, Response } from "express";
 import type { ApiResponse, PersonResource } from "../contracts.js";
+import { authContext } from "../middlewares/auth.js";
 import { listPeople } from "../services/people.service.js";
 import { toPersonResource } from "../views/person.view.js";
 
-interface RequestWithAuth extends Request {
-  authenticatedUserId: string;
-  authenticatedFamilyId: string;
-}
-
 export async function getPeople(
-  req: RequestWithAuth,
+  req: Request,
   res: Response,
   next: NextFunction,
 ): Promise<void> {
   try {
-    const people = await listPeople(req.authenticatedFamilyId);
+    const { familyId } = authContext(req);
+    const people = await listPeople(familyId);
+
     const body: ApiResponse<PersonResource[]> = {
       data: people.map(toPersonResource),
     };

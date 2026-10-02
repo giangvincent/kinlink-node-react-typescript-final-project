@@ -82,9 +82,11 @@ export async function login(
 
     const match = await bcrypt.compare(password, user.passwordHash);
     if (!match) {
-      // Constant-time comparison on the hash, but timing still leaks that the
-      // email exists (user not found ≠ wrong password). Preventing user enumeration
-      // requires more care (rate limiting, generic messages). Acknowledge the leak.
+      // compare() may exit early, but it compares digests, so the fixed 2^cost
+      // work dominates and an early exit leaks nothing usable. The timing signal
+      // that does exist is elsewhere: a hit runs a bcrypt round and a miss does
+      // not, so "no such user" and "wrong password" are distinguishable. Keep the
+      // message generic and rate limit.
       res.status(401).json({ message: "Invalid credentials" });
       return;
     }
