@@ -21,6 +21,7 @@ model Family {
   createdAt DateTime @default(now()) @map("created_at")
 
   people Person[]
+  users  User[]
 
   @@map("families")
 }
@@ -39,4 +40,17 @@ model Person {
 
   @@index([familyId])
   @@map("people")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique @map("email")
+  passwordHash String   @map("password_hash")
+  familyId     String   @map("family_id")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  family Family @relation(fields: [familyId], references: [id], onDelete: Cascade)
+
+  @@map("users")
 }

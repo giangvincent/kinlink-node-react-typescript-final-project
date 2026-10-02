@@ -1,14 +1,15 @@
 import { Router } from "express";
 import type { ApiResponse } from "../contracts.js";
+import { authRouter } from "./auth.routes.js";
 import { peopleRouter } from "./people.routes.js";
+import { requireAuth } from "../middlewares/auth.js";
 
 export const apiRouter = Router();
 
-// A liveness check has no business rules and touches nothing, so it does not
-// deserve a controller. Inline is the honest choice here.
 apiRouter.get("/health", (_req, res) => {
   const body: ApiResponse<{ status: "ok" }> = { data: { status: "ok" } };
   res.status(200).json(body);
 });
 
-apiRouter.use("/people", peopleRouter);
+apiRouter.use("/auth", authRouter);
+apiRouter.use("/people", requireAuth, peopleRouter);
