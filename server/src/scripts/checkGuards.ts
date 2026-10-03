@@ -1,8 +1,9 @@
 import { createApp } from "../app.js";
 
-// Deliberately no cookie. requireAuth rejects before any controller runs, so
-// this script never touches the database -- MySQL does not need to be up.
-const PROTECTED = ["/api/people"];
+// A parameterised path cannot be fetched literally. The placeholder works
+// precisely because requireAuth rejects BEFORE the slug is ever used, so the 401
+// does not depend on its value.
+const PROTECTED = ["/api/families/__probe__/people"];
 
 async function main(): Promise<void> {
   // Port 0 asks the OS for a free port, so this never collides with `npm run dev`.

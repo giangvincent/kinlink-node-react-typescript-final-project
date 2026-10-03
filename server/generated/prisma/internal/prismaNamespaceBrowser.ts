@@ -53,7 +53,8 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   Family: 'Family',
   Person: 'Person',
-  User: 'User'
+  User: 'User',
+  FamilyMember: 'FamilyMember'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -100,12 +101,22 @@ export const UserScalarFieldEnum = {
   id: 'id',
   email: 'email',
   passwordHash: 'passwordHash',
-  familyId: 'familyId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
+export const FamilyMemberScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  familyId: 'familyId',
+  role: 'role',
+  createdAt: 'createdAt'
+} as const
+
+export type FamilyMemberScalarFieldEnum = (typeof FamilyMemberScalarFieldEnum)[keyof typeof FamilyMemberScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -145,9 +156,17 @@ export type PersonOrderByRelevanceFieldEnum = (typeof PersonOrderByRelevanceFiel
 export const UserOrderByRelevanceFieldEnum = {
   id: 'id',
   email: 'email',
-  passwordHash: 'passwordHash',
-  familyId: 'familyId'
+  passwordHash: 'passwordHash'
 } as const
 
 export type UserOrderByRelevanceFieldEnum = (typeof UserOrderByRelevanceFieldEnum)[keyof typeof UserOrderByRelevanceFieldEnum]
+
+
+export const FamilyMemberOrderByRelevanceFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  familyId: 'familyId'
+} as const
+
+export type FamilyMemberOrderByRelevanceFieldEnum = (typeof FamilyMemberOrderByRelevanceFieldEnum)[keyof typeof FamilyMemberOrderByRelevanceFieldEnum]
 

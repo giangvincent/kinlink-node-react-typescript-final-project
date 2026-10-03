@@ -119,6 +119,23 @@ export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedDateTimeNullableFilter<$PrismaModel>
 }
 
+export type EnumFamilyRoleFilter<$PrismaModel = never> = {
+  equals?: $Enums.FamilyRole | Prisma.EnumFamilyRoleFieldRefInput<$PrismaModel>
+  in?: $Enums.FamilyRole[]
+  notIn?: $Enums.FamilyRole[]
+  not?: Prisma.NestedEnumFamilyRoleFilter<$PrismaModel> | $Enums.FamilyRole
+}
+
+export type EnumFamilyRoleWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.FamilyRole | Prisma.EnumFamilyRoleFieldRefInput<$PrismaModel>
+  in?: $Enums.FamilyRole[]
+  notIn?: $Enums.FamilyRole[]
+  not?: Prisma.NestedEnumFamilyRoleWithAggregatesFilter<$PrismaModel> | $Enums.FamilyRole
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumFamilyRoleFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumFamilyRoleFilter<$PrismaModel>
+}
+
 export type NestedStringFilter<$PrismaModel = never> = {
   equals?: string | Prisma.StringFieldRefInput<$PrismaModel>
   in?: string[]
@@ -239,6 +256,23 @@ export type NestedIntNullableFilter<$PrismaModel = never> = {
   gt?: number | Prisma.IntFieldRefInput<$PrismaModel>
   gte?: number | Prisma.IntFieldRefInput<$PrismaModel>
   not?: Prisma.NestedIntNullableFilter<$PrismaModel> | number | null
+}
+
+export type NestedEnumFamilyRoleFilter<$PrismaModel = never> = {
+  equals?: $Enums.FamilyRole | Prisma.EnumFamilyRoleFieldRefInput<$PrismaModel>
+  in?: $Enums.FamilyRole[]
+  notIn?: $Enums.FamilyRole[]
+  not?: Prisma.NestedEnumFamilyRoleFilter<$PrismaModel> | $Enums.FamilyRole
+}
+
+export type NestedEnumFamilyRoleWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.FamilyRole | Prisma.EnumFamilyRoleFieldRefInput<$PrismaModel>
+  in?: $Enums.FamilyRole[]
+  notIn?: $Enums.FamilyRole[]
+  not?: Prisma.NestedEnumFamilyRoleWithAggregatesFilter<$PrismaModel> | $Enums.FamilyRole
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumFamilyRoleFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumFamilyRoleFilter<$PrismaModel>
 }
 
 

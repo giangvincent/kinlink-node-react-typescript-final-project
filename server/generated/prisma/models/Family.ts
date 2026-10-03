@@ -175,7 +175,7 @@ export type FamilyWhereInput = {
   name?: Prisma.StringFilter<"Family"> | string
   createdAt?: Prisma.DateTimeFilter<"Family"> | Date | string
   people?: Prisma.PersonListRelationFilter
-  users?: Prisma.UserListRelationFilter
+  memberships?: Prisma.FamilyMemberListRelationFilter
 }
 
 export type FamilyOrderByWithRelationInput = {
@@ -184,7 +184,7 @@ export type FamilyOrderByWithRelationInput = {
   name?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   people?: Prisma.PersonOrderByRelationAggregateInput
-  users?: Prisma.UserOrderByRelationAggregateInput
+  memberships?: Prisma.FamilyMemberOrderByRelationAggregateInput
   _relevance?: Prisma.FamilyOrderByRelevanceInput
 }
 
@@ -197,7 +197,7 @@ export type FamilyWhereUniqueInput = Prisma.AtLeast<{
   name?: Prisma.StringFilter<"Family"> | string
   createdAt?: Prisma.DateTimeFilter<"Family"> | Date | string
   people?: Prisma.PersonListRelationFilter
-  users?: Prisma.UserListRelationFilter
+  memberships?: Prisma.FamilyMemberListRelationFilter
 }, "id" | "slug">
 
 export type FamilyOrderByWithAggregationInput = {
@@ -226,7 +226,7 @@ export type FamilyCreateInput = {
   name: string
   createdAt?: Date | string
   people?: Prisma.PersonCreateNestedManyWithoutFamilyInput
-  users?: Prisma.UserCreateNestedManyWithoutFamilyInput
+  memberships?: Prisma.FamilyMemberCreateNestedManyWithoutFamilyInput
 }
 
 export type FamilyUncheckedCreateInput = {
@@ -235,7 +235,7 @@ export type FamilyUncheckedCreateInput = {
   name: string
   createdAt?: Date | string
   people?: Prisma.PersonUncheckedCreateNestedManyWithoutFamilyInput
-  users?: Prisma.UserUncheckedCreateNestedManyWithoutFamilyInput
+  memberships?: Prisma.FamilyMemberUncheckedCreateNestedManyWithoutFamilyInput
 }
 
 export type FamilyUpdateInput = {
@@ -244,7 +244,7 @@ export type FamilyUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   people?: Prisma.PersonUpdateManyWithoutFamilyNestedInput
-  users?: Prisma.UserUpdateManyWithoutFamilyNestedInput
+  memberships?: Prisma.FamilyMemberUpdateManyWithoutFamilyNestedInput
 }
 
 export type FamilyUncheckedUpdateInput = {
@@ -253,7 +253,7 @@ export type FamilyUncheckedUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   people?: Prisma.PersonUncheckedUpdateManyWithoutFamilyNestedInput
-  users?: Prisma.UserUncheckedUpdateManyWithoutFamilyNestedInput
+  memberships?: Prisma.FamilyMemberUncheckedUpdateManyWithoutFamilyNestedInput
 }
 
 export type FamilyCreateManyInput = {
@@ -331,18 +331,18 @@ export type FamilyUpdateOneRequiredWithoutPeopleNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.FamilyUpdateToOneWithWhereWithoutPeopleInput, Prisma.FamilyUpdateWithoutPeopleInput>, Prisma.FamilyUncheckedUpdateWithoutPeopleInput>
 }
 
-export type FamilyCreateNestedOneWithoutUsersInput = {
-  create?: Prisma.XOR<Prisma.FamilyCreateWithoutUsersInput, Prisma.FamilyUncheckedCreateWithoutUsersInput>
-  connectOrCreate?: Prisma.FamilyCreateOrConnectWithoutUsersInput
+export type FamilyCreateNestedOneWithoutMembershipsInput = {
+  create?: Prisma.XOR<Prisma.FamilyCreateWithoutMembershipsInput, Prisma.FamilyUncheckedCreateWithoutMembershipsInput>
+  connectOrCreate?: Prisma.FamilyCreateOrConnectWithoutMembershipsInput
   connect?: Prisma.FamilyWhereUniqueInput
 }
 
-export type FamilyUpdateOneRequiredWithoutUsersNestedInput = {
-  create?: Prisma.XOR<Prisma.FamilyCreateWithoutUsersInput, Prisma.FamilyUncheckedCreateWithoutUsersInput>
-  connectOrCreate?: Prisma.FamilyCreateOrConnectWithoutUsersInput
-  upsert?: Prisma.FamilyUpsertWithoutUsersInput
+export type FamilyUpdateOneRequiredWithoutMembershipsNestedInput = {
+  create?: Prisma.XOR<Prisma.FamilyCreateWithoutMembershipsInput, Prisma.FamilyUncheckedCreateWithoutMembershipsInput>
+  connectOrCreate?: Prisma.FamilyCreateOrConnectWithoutMembershipsInput
+  upsert?: Prisma.FamilyUpsertWithoutMembershipsInput
   connect?: Prisma.FamilyWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.FamilyUpdateToOneWithWhereWithoutUsersInput, Prisma.FamilyUpdateWithoutUsersInput>, Prisma.FamilyUncheckedUpdateWithoutUsersInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.FamilyUpdateToOneWithWhereWithoutMembershipsInput, Prisma.FamilyUpdateWithoutMembershipsInput>, Prisma.FamilyUncheckedUpdateWithoutMembershipsInput>
 }
 
 export type FamilyCreateWithoutPeopleInput = {
@@ -350,7 +350,7 @@ export type FamilyCreateWithoutPeopleInput = {
   slug: string
   name: string
   createdAt?: Date | string
-  users?: Prisma.UserCreateNestedManyWithoutFamilyInput
+  memberships?: Prisma.FamilyMemberCreateNestedManyWithoutFamilyInput
 }
 
 export type FamilyUncheckedCreateWithoutPeopleInput = {
@@ -358,7 +358,7 @@ export type FamilyUncheckedCreateWithoutPeopleInput = {
   slug: string
   name: string
   createdAt?: Date | string
-  users?: Prisma.UserUncheckedCreateNestedManyWithoutFamilyInput
+  memberships?: Prisma.FamilyMemberUncheckedCreateNestedManyWithoutFamilyInput
 }
 
 export type FamilyCreateOrConnectWithoutPeopleInput = {
@@ -382,7 +382,7 @@ export type FamilyUpdateWithoutPeopleInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  users?: Prisma.UserUpdateManyWithoutFamilyNestedInput
+  memberships?: Prisma.FamilyMemberUpdateManyWithoutFamilyNestedInput
 }
 
 export type FamilyUncheckedUpdateWithoutPeopleInput = {
@@ -390,10 +390,10 @@ export type FamilyUncheckedUpdateWithoutPeopleInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  users?: Prisma.UserUncheckedUpdateManyWithoutFamilyNestedInput
+  memberships?: Prisma.FamilyMemberUncheckedUpdateManyWithoutFamilyNestedInput
 }
 
-export type FamilyCreateWithoutUsersInput = {
+export type FamilyCreateWithoutMembershipsInput = {
   id?: string
   slug: string
   name: string
@@ -401,7 +401,7 @@ export type FamilyCreateWithoutUsersInput = {
   people?: Prisma.PersonCreateNestedManyWithoutFamilyInput
 }
 
-export type FamilyUncheckedCreateWithoutUsersInput = {
+export type FamilyUncheckedCreateWithoutMembershipsInput = {
   id?: string
   slug: string
   name: string
@@ -409,23 +409,23 @@ export type FamilyUncheckedCreateWithoutUsersInput = {
   people?: Prisma.PersonUncheckedCreateNestedManyWithoutFamilyInput
 }
 
-export type FamilyCreateOrConnectWithoutUsersInput = {
+export type FamilyCreateOrConnectWithoutMembershipsInput = {
   where: Prisma.FamilyWhereUniqueInput
-  create: Prisma.XOR<Prisma.FamilyCreateWithoutUsersInput, Prisma.FamilyUncheckedCreateWithoutUsersInput>
+  create: Prisma.XOR<Prisma.FamilyCreateWithoutMembershipsInput, Prisma.FamilyUncheckedCreateWithoutMembershipsInput>
 }
 
-export type FamilyUpsertWithoutUsersInput = {
-  update: Prisma.XOR<Prisma.FamilyUpdateWithoutUsersInput, Prisma.FamilyUncheckedUpdateWithoutUsersInput>
-  create: Prisma.XOR<Prisma.FamilyCreateWithoutUsersInput, Prisma.FamilyUncheckedCreateWithoutUsersInput>
+export type FamilyUpsertWithoutMembershipsInput = {
+  update: Prisma.XOR<Prisma.FamilyUpdateWithoutMembershipsInput, Prisma.FamilyUncheckedUpdateWithoutMembershipsInput>
+  create: Prisma.XOR<Prisma.FamilyCreateWithoutMembershipsInput, Prisma.FamilyUncheckedCreateWithoutMembershipsInput>
   where?: Prisma.FamilyWhereInput
 }
 
-export type FamilyUpdateToOneWithWhereWithoutUsersInput = {
+export type FamilyUpdateToOneWithWhereWithoutMembershipsInput = {
   where?: Prisma.FamilyWhereInput
-  data: Prisma.XOR<Prisma.FamilyUpdateWithoutUsersInput, Prisma.FamilyUncheckedUpdateWithoutUsersInput>
+  data: Prisma.XOR<Prisma.FamilyUpdateWithoutMembershipsInput, Prisma.FamilyUncheckedUpdateWithoutMembershipsInput>
 }
 
-export type FamilyUpdateWithoutUsersInput = {
+export type FamilyUpdateWithoutMembershipsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
@@ -433,7 +433,7 @@ export type FamilyUpdateWithoutUsersInput = {
   people?: Prisma.PersonUpdateManyWithoutFamilyNestedInput
 }
 
-export type FamilyUncheckedUpdateWithoutUsersInput = {
+export type FamilyUncheckedUpdateWithoutMembershipsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
@@ -448,12 +448,12 @@ export type FamilyUncheckedUpdateWithoutUsersInput = {
 
 export type FamilyCountOutputType = {
   people: number
-  users: number
+  memberships: number
 }
 
 export type FamilyCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   people?: boolean | FamilyCountOutputTypeCountPeopleArgs
-  users?: boolean | FamilyCountOutputTypeCountUsersArgs
+  memberships?: boolean | FamilyCountOutputTypeCountMembershipsArgs
 }
 
 /**
@@ -476,8 +476,8 @@ export type FamilyCountOutputTypeCountPeopleArgs<ExtArgs extends runtime.Types.E
 /**
  * FamilyCountOutputType without action
  */
-export type FamilyCountOutputTypeCountUsersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.UserWhereInput
+export type FamilyCountOutputTypeCountMembershipsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.FamilyMemberWhereInput
 }
 
 
@@ -487,7 +487,7 @@ export type FamilySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   name?: boolean
   createdAt?: boolean
   people?: boolean | Prisma.Family$peopleArgs<ExtArgs>
-  users?: boolean | Prisma.Family$usersArgs<ExtArgs>
+  memberships?: boolean | Prisma.Family$membershipsArgs<ExtArgs>
   _count?: boolean | Prisma.FamilyCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["family"]>
 
@@ -503,7 +503,7 @@ export type FamilySelectScalar = {
 export type FamilyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "slug" | "name" | "createdAt", ExtArgs["result"]["family"]>
 export type FamilyInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   people?: boolean | Prisma.Family$peopleArgs<ExtArgs>
-  users?: boolean | Prisma.Family$usersArgs<ExtArgs>
+  memberships?: boolean | Prisma.Family$membershipsArgs<ExtArgs>
   _count?: boolean | Prisma.FamilyCountOutputTypeDefaultArgs<ExtArgs>
 }
 
@@ -511,7 +511,7 @@ export type $FamilyPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
   name: "Family"
   objects: {
     people: Prisma.$PersonPayload<ExtArgs>[]
-    users: Prisma.$UserPayload<ExtArgs>[]
+    memberships: Prisma.$FamilyMemberPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -859,7 +859,7 @@ readonly fields: FamilyFieldRefs;
 export interface Prisma__FamilyClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   people<T extends Prisma.Family$peopleArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Family$peopleArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PersonPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  users<T extends Prisma.Family$usersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Family$usersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  memberships<T extends Prisma.Family$membershipsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Family$membershipsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FamilyMemberPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1265,27 +1265,27 @@ export type Family$peopleArgs<ExtArgs extends runtime.Types.Extensions.InternalA
 }
 
 /**
- * Family.users
+ * Family.memberships
  */
-export type Family$usersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type Family$membershipsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the User
+   * Select specific fields to fetch from the FamilyMember
    */
-  select?: Prisma.UserSelect<ExtArgs> | null
+  select?: Prisma.FamilyMemberSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the User
+   * Omit specific fields from the FamilyMember
    */
-  omit?: Prisma.UserOmit<ExtArgs> | null
+  omit?: Prisma.FamilyMemberOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.UserInclude<ExtArgs> | null
-  where?: Prisma.UserWhereInput
-  orderBy?: Prisma.UserOrderByWithRelationInput | Prisma.UserOrderByWithRelationInput[]
-  cursor?: Prisma.UserWhereUniqueInput
+  include?: Prisma.FamilyMemberInclude<ExtArgs> | null
+  where?: Prisma.FamilyMemberWhereInput
+  orderBy?: Prisma.FamilyMemberOrderByWithRelationInput | Prisma.FamilyMemberOrderByWithRelationInput[]
+  cursor?: Prisma.FamilyMemberWhereUniqueInput
   take?: number
   skip?: number
-  distinct?: Prisma.UserScalarFieldEnum | Prisma.UserScalarFieldEnum[]
+  distinct?: Prisma.FamilyMemberScalarFieldEnum | Prisma.FamilyMemberScalarFieldEnum[]
 }
 
 /**

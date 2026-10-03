@@ -14,14 +14,20 @@ enum Gender {
   unknown
 }
 
+enum FamilyRole {
+  owner
+  admin
+  member
+}
+
 model Family {
   id        String   @id @default(uuid())
   slug      String   @unique
   name      String
   createdAt DateTime @default(now()) @map("created_at")
 
-  people Person[]
-  users  User[]
+  people      Person[]
+  memberships FamilyMember[]
 
   @@map("families")
 }
@@ -46,11 +52,25 @@ model User {
   id           String   @id @default(uuid())
   email        String   @unique @map("email")
   passwordHash String   @map("password_hash")
-  familyId     String   @map("family_id")
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
-  family Family @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  memberships FamilyMember[]
 
   @@map("users")
+}
+
+model FamilyMember {
+  id        String     @id @default(uuid())
+  userId    String     @map("user_id")
+  familyId  String     @map("family_id")
+  role      FamilyRole @default(member)
+  createdAt DateTime   @default(now()) @map("created_at")
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  family Family @relation(fields: [familyId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, familyId])
+  @@index([familyId])
+  @@map("family_members")
 }

@@ -11,4 +11,5 @@
 export type * from './models/Family.js'
 export type * from './models/Person.js'
 export type * from './models/User.js'
+export type * from './models/FamilyMember.js'
 export type * from './commonInputTypes.js'

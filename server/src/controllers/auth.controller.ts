@@ -2,6 +2,9 @@ import type { NextFunction, Request, Response } from "express";
 import bcrypt from "bcrypt";
 import { prisma } from "../config/database.js";
 import type { AuthResponse } from "../../../shared/contracts/auth.js";
+import * as userModel from "../models/user.model.js";
+
+const SALT_ROUNDS = 12;
 
 /**
  * Register a new user. Creates the account, hashes the password, assigns the
@@ -19,46 +22,23 @@ export async function register(
   try {
     const { email, password }: { email: string; password: string } = req.body;
 
-    // 1. Check uniqueness before hashing — cheap failure
-    const existing = await prisma.user.findUnique({ where: { email } });
+    const existing = await userModel.findByEmail(email);
     if (existing) {
       res.status(409).json({ message: "Email already registered" });
       return;
     }
 
-    // 2. Hash the password (cost factor 12 is recommended for modern hardware)
-    const saltRounds = 12;
-    const passwordHash = await bcrypt.hash(password, saltRounds);
-
-    // 3. Look up the target family (you could also auto-create during invite flow)
-    // For this lesson: look up by slug to establish family membership.
-    const family = await prisma.family.findFirst({
-      where: { slug: "nguyen" }, // replace with user selection in future
-    });
-    if (!family) {
-      res.status(404).json({ message: "Family not found" });
-      return;
-    }
-
-    // 4. Create user with session association
-    const user = await prisma.user.create({
-      data: {
-        email,
-        passwordHash,
-        familyId: family.id,
-      },
+    const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
+    const { user } = await userModel.createWithOwnedFamily({
+      email,
+      passwordHash,
     });
 
-    // 5. Log them in
+    // Identity only. Which family, and what you may do there, is per request.
     req.session.userId = user.id;
-    req.session.familyId = family.id;
 
     res.status(201).json({
-      data: {
-        userId: user.id,
-        familyId: family.id,
-        email: user.email,
-      } satisfies AuthResponse,
+      data: { userId: user.id, email: user.email } satisfies AuthResponse,
     });
   } catch (error) {
     next(error);
@@ -92,12 +72,10 @@ export async function login(
     }
 
     req.session.userId = user.id;
-    req.session.familyId = user.familyId;
 
     res.status(200).json({
       data: {
         userId: user.id,
-        familyId: user.familyId,
         email: user.email,
       } satisfies AuthResponse,
     });
@@ -151,7 +129,6 @@ export async function whoami(
     res.status(200).json({
       data: {
         userId: user.id,
-        familyId: user.familyId,
         email: user.email,
       } satisfies AuthResponse,
     });

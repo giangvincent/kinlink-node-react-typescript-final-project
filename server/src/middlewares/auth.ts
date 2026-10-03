@@ -1,43 +1,27 @@
 import type { Request, RequestHandler } from "express";
 import type { ApiErrorBody } from "../contracts.js";
 
-/**
- * Reject unauthenticated requests. 401, not 500: nothing failed on the server,
- * the caller simply did not present credentials.
- */
+/** Reject unauthenticated requests. 401, not 500: nothing failed on the server. */
 export const requireAuth: RequestHandler = (req, res, next) => {
-  const { userId, familyId } = req.session;
+  const { userId } = req.session;
 
-  if (!userId || !familyId) {
+  if (!userId) {
     const body: ApiErrorBody = { message: "Authentication required" };
     res.status(401).json(body);
     return;
   }
 
   req.authenticatedUserId = userId;
-  req.authenticatedFamilyId = familyId;
   next();
 };
 
-/**
- * Read the auth context, refusing to guess.
- *
- * Anything mounted below requireAuth will have set these. If they are missing we
- * have a wiring bug -- a route reached a controller without the guard -- and a
- * wiring bug must fail loudly rather than quietly reading the wrong rows.
- */
-export function authContext(req: Request): {
-  userId: string;
-  familyId: string;
-} {
-  const { authenticatedUserId, authenticatedFamilyId } = req;
+/** Identity, refusing to guess. Throws only if the chain is wired wrong. */
+export function authContext(req: Request): { userId: string } {
+  const { authenticatedUserId } = req;
 
-  if (!authenticatedUserId || !authenticatedFamilyId) {
+  if (!authenticatedUserId) {
     throw new Error("Route is missing requireAuth");
   }
 
-  return {
-    userId: authenticatedUserId,
-    familyId: authenticatedFamilyId,
-  };
+  return { userId: authenticatedUserId };
 }

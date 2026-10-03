@@ -7,7 +7,6 @@ export interface RegisterRequest {
 /** What follows the user home after login */
 export interface AuthResponse {
   userId: string;
-  familyId: string;
   email: string;
 }
 

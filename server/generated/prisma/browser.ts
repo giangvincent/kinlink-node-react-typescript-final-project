@@ -32,3 +32,8 @@ export type Person = Prisma.PersonModel
  * 
  */
 export type User = Prisma.UserModel
+/**
+ * Model FamilyMember
+ * 
+ */
+export type FamilyMember = Prisma.FamilyMemberModel

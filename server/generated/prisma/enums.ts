@@ -17,3 +17,12 @@ export const Gender = {
 } as const
 
 export type Gender = (typeof Gender)[keyof typeof Gender]
+
+
+export const FamilyRole = {
+  owner: 'owner',
+  admin: 'admin',
+  member: 'member'
+} as const
+
+export type FamilyRole = (typeof FamilyRole)[keyof typeof FamilyRole]
