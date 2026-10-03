@@ -1,11 +1,39 @@
 import "dotenv/config";
 import { prisma } from "../config/database.js";
+
 import bcrypt from "bcrypt";
 
+const SALT_ROUNDS = 12;
+const PASSWORD = "correcthorsebatterystaple";
+const passwordHash = await bcrypt.hash(PASSWORD, SALT_ROUNDS);
+
 async function main(): Promise<void> {
-  const SALT_ROUNDS = 12;
-  const PASSWORD = "correcthorsebatterystaple";
-  const passwordHash = await bcrypt.hash(PASSWORD, SALT_ROUNDS);
+  const family = await prisma.family.upsert({
+    where: { slug: "nguyen" },
+    update: {},
+    create: { slug: "nguyen", name: "Nguyễn" },
+  });
+
+  await prisma.person.deleteMany({ where: { familyId: family.id } });
+
+  await prisma.person.createMany({
+    data: [
+      {
+        familyId: family.id,
+        displayName: "Nguyễn Văn An",
+        gender: "male",
+        birthDate: new Date("1948-03-02"),
+        deathDate: null,
+      },
+      {
+        familyId: family.id,
+        displayName: "Trần Thị Bình",
+        gender: "female",
+        birthDate: new Date("1952-07-19"),
+        deathDate: null,
+      },
+    ],
+  });
 
   const nguyen = await prisma.family.upsert({
     where: { slug: "nguyen" },
@@ -35,6 +63,10 @@ async function main(): Promise<void> {
   }
 
   console.log(`seeded; every seeded user's password is "${PASSWORD}"`);
+
+  console.log(
+    `seeded family "${family.slug}" with ${await prisma.person.count()} people`,
+  );
 }
 
 main()
