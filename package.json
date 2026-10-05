@@ -16,7 +16,8 @@
     "db:migrate": "prisma migrate dev && prisma generate --generator client",
     "db:studio": "prisma studio",
     "db:seed": "tsx server/src/scripts/seed.ts",
-    "check:guards": "tsx server/src/scripts/checkGuards.ts"
+    "check:guards": "tsx server/src/scripts/checkGuards.ts",
+    "check:ownership": "tsx server/src/scripts/checkOwnership.ts"
   },
   "dependencies": {
     "@prisma/adapter-mariadb": "^7.10.0",

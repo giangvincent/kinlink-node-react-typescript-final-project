@@ -1,9 +1,19 @@
 import { Router } from "express";
+import { leave, patchMemberRole } from "../controllers/family.controller.js";
 import { getFamilyPeople } from "../controllers/people.controller.js";
+import { requireRole } from "../middlewares/role.js";
 
-// Note: no `mergeParams` and no reading of :slug. loadFamily already resolved the
-// family and put it on the request; re-reading the parameter down here would mean
-// a second lookup and a second chance to trust a string.
+// loadFamily already ran at the mount, so requireRole needs no query of its own.
 export const familyRouter = Router();
 
 familyRouter.get("/people", getFamilyPeople);
+
+// owner-only: changing who may do what is the most dangerous operation here.
+familyRouter.patch(
+  "/members/:membershipId",
+  requireRole("owner"),
+  patchMemberRole,
+);
+
+// any member may leave; the refusal case is 409, not 403.
+familyRouter.post("/leave", leave);
