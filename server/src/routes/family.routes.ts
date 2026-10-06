@@ -1,5 +1,9 @@
 import { Router } from "express";
-import { leave, patchMemberRole } from "../controllers/family.controller.js";
+import {
+  leave,
+  patchMemberRole,
+  transferOwner,
+} from "../controllers/family.controller.js";
 import { getFamilyPeople } from "../controllers/people.controller.js";
 import { requireRole } from "../middlewares/role.js";
 
@@ -17,3 +21,6 @@ familyRouter.patch(
 
 // any member may leave; the refusal case is 409, not 403.
 familyRouter.post("/leave", leave);
+
+// owner-only, and it is the operation the last-owner refusal points at.
+familyRouter.post("/transfer-ownership", requireRole("owner"), transferOwner);

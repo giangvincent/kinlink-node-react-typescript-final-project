@@ -95,3 +95,25 @@ export async function deleteById(
 ): Promise<void> {
   await database.familyMember.delete({ where: { id: membershipId } });
 }
+
+export interface MemberCandidate {
+  membershipId: string;
+  email: string;
+}
+
+/**
+ * Everyone in the family except one membership -- the people a last owner could
+ * transfer to. The refusal and its way out travel together, so the client can
+ * render "transfer ownership?" in one round trip.
+ */
+export async function findOtherMembers(
+  familyId: string,
+  selfMembershipId: string,
+  database: Db = prisma,
+): Promise<MemberCandidate[]> {
+  const rows = await database.familyMember.findMany({
+    where: { familyId, id: { not: selfMembershipId } },
+    include: { user: { select: { id: true, email: true } } },
+  });
+  return rows.map((row) => ({ membershipId: row.id, email: row.user.email }));
+}

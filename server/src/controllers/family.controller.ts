@@ -3,6 +3,11 @@ import type { ApiErrorBody } from "../contracts.js";
 import { ROLES, type Role } from "../models/membership.model.js";
 import { familyContext } from "../middlewares/family.js";
 import { changeRole, leaveFamily } from "../services/membership.service.js";
+import { lastOwnerProblem, problem } from "../views/problem.view.js";
+import {
+  transferOwnership,
+  type KeepRole,
+} from "../services/membership.service.js";
 
 function isRole(value: unknown): value is Role {
   return (
@@ -36,12 +41,14 @@ export async function patchMemberRole(
     });
 
     if (!result.ok) {
-      // "no such member in this family" -> 404; "that would orphan the family" -> 409.
-      const body: ApiErrorBody =
-        result.reason === "not-found"
-          ? { message: "Member not found" }
-          : { message: "A family must keep at least one owner" };
-      res.status(result.reason === "not-found" ? 404 : 409).json(body);
+      if (result.reason === "not-found") {
+        res.status(404).json({ message: "Member not found" });
+        return;
+      }
+      res
+        .status(409)
+        .type("application/problem+json")
+        .json(lastOwnerProblem(family.slug, result.candidates));
       return;
     }
 
@@ -69,6 +76,66 @@ export async function leave(
         message: "A family must keep at least one owner",
       };
       res.status(409).json(body);
+      return;
+    }
+
+    res.status(204).end();
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function transferOwner(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const { family, membership } = familyContext(req);
+    // Express 5: req.body is undefined when nothing parsed it.
+    const body = (req.body ?? {}) as { to?: unknown; keepRole?: unknown };
+    const to = body.to;
+    const keepRole = body.keepRole ?? "member";
+
+    if (
+      typeof to !== "string" ||
+      (keepRole !== "member" && keepRole !== "admin")
+    ) {
+      res.status(400).json({
+        message: "to must be a membership id; keepRole must be member or admin",
+      });
+      return;
+    }
+
+    const result = await transferOwnership({
+      familyId: family.id,
+      callerMembershipId: membership.id,
+      toMembershipId: to,
+      keepRole,
+    });
+
+    if (!result.ok) {
+      if (result.reason === "self") {
+        res.status(400).json({ message: "You already own this family" });
+        return;
+      }
+      if (result.reason === "not-found") {
+        res.status(404).json({ message: "Member not found" });
+        return;
+      }
+      // "not-owner": demoted mid-request. A state conflict, not a verdict on
+      // the caller -- so 409, and the client reloads and retries.
+      res
+        .status(409)
+        .type("application/problem+json")
+        .json(
+          problem({
+            code: "not_owner",
+            status: 409,
+            detail:
+              "Your role changed while this request was in flight. Reload and try again.",
+          }),
+        );
       return;
     }
 
