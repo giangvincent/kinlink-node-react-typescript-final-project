@@ -54,7 +54,8 @@ export const ModelName = {
   Family: 'Family',
   Person: 'Person',
   User: 'User',
-  FamilyMember: 'FamilyMember'
+  FamilyMember: 'FamilyMember',
+  Invitation: 'Invitation'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -119,6 +120,20 @@ export const FamilyMemberScalarFieldEnum = {
 export type FamilyMemberScalarFieldEnum = (typeof FamilyMemberScalarFieldEnum)[keyof typeof FamilyMemberScalarFieldEnum]
 
 
+export const InvitationScalarFieldEnum = {
+  id: 'id',
+  familyId: 'familyId',
+  role: 'role',
+  email: 'email',
+  tokenHash: 'tokenHash',
+  expiresAt: 'expiresAt',
+  usedAt: 'usedAt',
+  createdBy: 'createdBy'
+} as const
+
+export type InvitationScalarFieldEnum = (typeof InvitationScalarFieldEnum)[keyof typeof InvitationScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -169,4 +184,15 @@ export const FamilyMemberOrderByRelevanceFieldEnum = {
 } as const
 
 export type FamilyMemberOrderByRelevanceFieldEnum = (typeof FamilyMemberOrderByRelevanceFieldEnum)[keyof typeof FamilyMemberOrderByRelevanceFieldEnum]
+
+
+export const InvitationOrderByRelevanceFieldEnum = {
+  id: 'id',
+  familyId: 'familyId',
+  email: 'email',
+  tokenHash: 'tokenHash',
+  createdBy: 'createdBy'
+} as const
+
+export type InvitationOrderByRelevanceFieldEnum = (typeof InvitationOrderByRelevanceFieldEnum)[keyof typeof InvitationOrderByRelevanceFieldEnum]
 

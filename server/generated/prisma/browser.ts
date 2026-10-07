@@ -37,3 +37,8 @@ export type User = Prisma.UserModel
  * 
  */
 export type FamilyMember = Prisma.FamilyMemberModel
+/**
+ * Model Invitation
+ * 
+ */
+export type Invitation = Prisma.InvitationModel

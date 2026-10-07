@@ -28,6 +28,7 @@ model Family {
 
   people      Person[]
   memberships FamilyMember[]
+  invitations Invitation[]
 
   @@map("families")
 }
@@ -73,4 +74,20 @@ model FamilyMember {
   @@unique([userId, familyId])
   @@index([familyId])
   @@map("family_members")
+}
+
+model Invitation {
+  id        String    @id @default(uuid())
+  familyId  String    @map("family_id")
+  role      FamilyRole @default(member)   // never above the inviter's own
+  email     String?                        // set = targeted; null = shareable
+  tokenHash String  @unique @map("token_hash")
+  expiresAt DateTime @map("expires_at")
+  usedAt    DateTime? @map("used_at")
+  createdBy String    @map("created_by")
+
+  family Family @relation(fields: [familyId], references: [id], onDelete: Cascade)
+
+  @@index([familyId])
+  @@map("invitations")
 }
