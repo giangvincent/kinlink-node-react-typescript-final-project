@@ -117,10 +117,7 @@ export async function whoami(
       return;
     }
 
-    const user = await prisma.user.findUnique({
-      select: { id: true, email: true, familyId: true },
-      where: { id: userId },
-    });
+    const user = await userModel.findById(userId);
     if (!user) {
       res.status(401).json({ message: "Session invalid" });
       return;
