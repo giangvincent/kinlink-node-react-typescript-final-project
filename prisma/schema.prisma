@@ -79,12 +79,13 @@ model FamilyMember {
 model Invitation {
   id        String    @id @default(uuid())
   familyId  String    @map("family_id")
-  role      FamilyRole @default(member)   // never above the inviter's own
-  email     String?                        // set = targeted; null = shareable
+  role      FamilyRole @default(member)
+  email     String?
   tokenHash String  @unique @map("token_hash")
   expiresAt DateTime @map("expires_at")
   usedAt    DateTime? @map("used_at")
   createdBy String    @map("created_by")
+  createdAt DateTime  @default(now()) @map("created_at")
 
   family Family @relation(fields: [familyId], references: [id], onDelete: Cascade)
 

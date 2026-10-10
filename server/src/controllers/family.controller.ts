@@ -8,6 +8,10 @@ import {
   transferOwnership,
   type KeepRole,
 } from "../services/membership.service.js";
+import { authContext } from "../middlewares/auth.js";
+import { toFamilyResource } from "../views/family.view.js";
+import { listMyFamilies } from "../services/membership.service.js";
+import type { ApiResponse, FamilyResource } from "../contracts.js";
 
 function isRole(value: unknown): value is Role {
   return (
@@ -140,6 +144,32 @@ export async function transferOwner(
     }
 
     res.status(204).end();
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * Every family the caller belongs to.
+ *
+ * This is the one family-shaped route that runs with requireAuth alone. There is
+ * no :slug to resolve, because answering "which families are mine?" is the whole
+ * point -- and the caller is named by the session, never by the request.
+ */
+export async function getMyFamilies(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const { userId } = authContext(req);
+    const memberships = await listMyFamilies(userId);
+
+    const body: ApiResponse<FamilyResource[]> = {
+      data: memberships.map(toFamilyResource),
+    };
+
+    res.status(200).json(body);
   } catch (error) {
     next(error);
   }

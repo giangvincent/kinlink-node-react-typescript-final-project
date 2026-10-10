@@ -117,3 +117,22 @@ export async function findOtherMembers(
   });
   return rows.map((row) => ({ membershipId: row.id, email: row.user.email }));
 }
+
+/**
+ * Every family this user belongs to, oldest first.
+ *
+ * Same property as findMembershipWithFamily, over many rows instead of one: the
+ * userId is in the WHERE clause, so there is no version of this query that
+ * returns a family the caller has no membership in. The oldest first is what
+ * makes "your family" a stable answer instead of whatever the database returns.
+ */
+export async function findAllForUser(
+  userId: string,
+  database: Db = prisma,
+): Promise<(FamilyMember & { family: Family })[]> {
+  return database.familyMember.findMany({
+    where: { userId },
+    include: { family: true },
+    orderBy: { createdAt: "asc" },
+  });
+}

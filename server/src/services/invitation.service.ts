@@ -3,6 +3,8 @@ import { prisma } from "../config/database.js";
 import type { Db } from "../models/db.js";
 import { transact } from "../models/db.js";
 import { ROLES, type Role } from "../models/membership.model.js";
+import * as invitationModel from "../models/invitation.model.js";
+import type { Invitation } from "../models/invitation.model.js";
 
 export type InvitationResult =
   | { ok: true }
@@ -96,4 +98,16 @@ export async function acceptInvitation(
 
     return { ok: true };
   });
+}
+
+/**
+ * The invitations a family can still act on, newest first.
+ *
+ * "Pending" is a policy word, so it lives here rather than in the query the
+ * controller could have written: one definition of claimable, in one place.
+ */
+export async function listPendingInvitations(
+  familyId: string,
+): Promise<Invitation[]> {
+  return invitationModel.findPendingByFamily(familyId);
 }

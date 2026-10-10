@@ -177,3 +177,16 @@ export async function transferOwnership(input: {
     return { ok: true };
   });
 }
+
+/**
+ * The families this caller belongs to.
+ *
+ * A pass-through today -- the query is already scoped to the caller -- so the
+ * value is in the naming, not the logic: the controller never touches a model,
+ * and "which families are mine" has exactly one definition.
+ */
+export async function listMyFamilies(
+  userId: string,
+): Promise<(FamilyMember & { family: Family })[]> {
+  return membershipModel.findAllForUser(userId);
+}
