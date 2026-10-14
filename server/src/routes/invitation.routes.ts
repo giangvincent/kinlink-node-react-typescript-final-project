@@ -5,6 +5,8 @@ import { requireRole } from "../middlewares/role.js";
 import {
   createInvitation,
   acceptInvitation,
+  revokeInvitation,
+  resendInvitation,
 } from "../services/invitation.service.js";
 import { getFamilyInvitations } from "../controllers/invitation.controller.js";
 
@@ -69,3 +71,70 @@ acceptInvitationRouter.post(
 
 // Owner-only: the list carries invitees' emails and the roles they were offered.
 invitationRouter.get("/", requireRole("owner"), getFamilyInvitations);
+
+invitationRouter.post(
+  "/:invitationId/revoke",
+  requireRole("owner"),
+  async (req, res, next) => {
+    try {
+      const invitationId = req.params.invitationId;
+      if (typeof invitationId !== "string" || invitationId.length === 0) {
+        res.status(400).json({ message: "Missing invitationId" });
+        return;
+      }
+
+      const { family, membership } = familyContext(req);
+      const result = await revokeInvitation({
+        familyId: family.id,
+        inviterMembershipId: membership.id,
+        invitationId,
+      });
+      if (!result.ok) {
+        const status = result.reason === "not-owner" ? 403 : 409;
+        const message =
+          result.reason === "not-owner"
+            ? "Insufficient role"
+            : "That invitation is no longer pending";
+        res.status(status).json({ message });
+        return;
+      }
+      res.status(204).end();
+    } catch (e) {
+      next(e);
+    }
+  },
+);
+
+invitationRouter.post(
+  "/:invitationId/resend",
+  requireRole("owner"),
+  async (req, res, next) => {
+    try {
+      const invitationId = req.params.invitationId;
+      if (typeof invitationId !== "string" || invitationId.length === 0) {
+        res.status(400).json({ message: "Missing invitationId" });
+        return;
+      }
+
+      const { family, membership } = familyContext(req);
+      const result = await resendInvitation({
+        familyId: family.id,
+        inviterMembershipId: membership.id,
+        invitationId,
+      });
+      if (!result.ok) {
+        const status = result.reason === "not-pending" ? 409 : 403;
+        const message =
+          result.reason === "not-pending"
+            ? "That invitation is no longer pending"
+            : "Insufficient role";
+        res.status(status).json({ message });
+        return;
+      }
+      // Informal body: the client lesson (15e) moves this under { data: … }.
+      res.status(201).json({ token: result.token });
+    } catch (e) {
+      next(e);
+    }
+  },
+);

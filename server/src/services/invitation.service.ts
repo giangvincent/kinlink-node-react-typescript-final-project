@@ -18,6 +18,14 @@ export type InvitationResult =
   | { ok: true }
   | { ok: false; reason: "not-found" | "expired" | "used" | "already-member" };
 
+export type RevokeResult =
+  | { ok: true }
+  | { ok: false; reason: "not-owner" | "not-pending" };
+
+export type ResendResult =
+  | { ok: true; token: string }
+  | { ok: false; reason: "not-owner" | "not-pending" | "insufficient-role" };
+
 /** SHA-256 hex. Raw token sent once, only the hash stored. */
 function hashToken(token: string): string {
   return createHash("sha256").update(token).digest("hex");
@@ -150,4 +158,92 @@ export async function listPendingInvitations(
   familyId: string,
 ): Promise<Invitation[]> {
   return invitationModel.findPendingByFamily(familyId);
+}
+
+export interface InviteActionWindow {
+  afterLookup?: () => Promise<void>;
+}
+
+export async function revokeInvitation(input: {
+  familyId: string;
+  inviterMembershipId: string;
+  invitationId: string;
+}): Promise<RevokeResult> {
+  return transact(async (tx) => {
+    await membershipModel.lockFamily(input.familyId, tx);
+
+    const inviter = await membershipModel.findByFamily(
+      input.familyId,
+      input.inviterMembershipId,
+      tx,
+    );
+    if (!inviter || inviter.role !== "owner") {
+      return { ok: false, reason: "not-owner" };
+    }
+
+    const revoked = await invitationModel.revoke(
+      input.familyId,
+      input.invitationId,
+      tx,
+    );
+    if (revoked !== 1) return { ok: false, reason: "not-pending" };
+    return { ok: true };
+  });
+}
+
+export async function resendInvitation(
+  input: {
+    familyId: string;
+    inviterMembershipId: string;
+    invitationId: string;
+  },
+  window: InviteActionWindow = {},
+): Promise<ResendResult> {
+  return transact(async (tx) => {
+    await membershipModel.lockFamily(input.familyId, tx);
+
+    const inviter = await membershipModel.findByFamily(
+      input.familyId,
+      input.inviterMembershipId,
+      tx,
+    );
+    if (!inviter || inviter.role !== "owner") {
+      return { ok: false, reason: "not-owner" };
+    }
+
+    const old = await invitationModel.findById(
+      input.familyId,
+      input.invitationId,
+      tx,
+    );
+    if (
+      !old ||
+      old.usedAt !== null ||
+      old.revokedAt !== null ||
+      old.expiresAt <= new Date()
+    ) {
+      return { ok: false, reason: "not-pending" };
+    }
+    // Defense in depth: never reissue a role above the inviter's rank.
+    if (RANK[old.role] > RANK[inviter.role]) {
+      return { ok: false, reason: "insufficient-role" };
+    }
+
+    await window.afterLookup?.();
+
+    const token = randomBytes(32).toString("base64url");
+    await invitationModel.revoke(input.familyId, input.invitationId, tx);
+    await invitationModel.createInvitation(
+      {
+        familyId: input.familyId,
+        role: old.role,
+        email: old.email,
+        tokenHash: hashToken(token),
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        createdBy: inviter.userId,
+      },
+      tx,
+    );
+    return { ok: true, token };
+  });
 }

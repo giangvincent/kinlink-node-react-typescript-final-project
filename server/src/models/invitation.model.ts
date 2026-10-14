@@ -57,3 +57,26 @@ export async function createInvitation(
 ): Promise<void> {
   await database.invitation.create({ data: input });
 }
+
+export async function findById(
+  familyId: string,
+  invitationId: string,
+  database: Db = prisma,
+): Promise<Invitation | null> {
+  return database.invitation.findFirst({
+    where: { id: invitationId, familyId },
+  });
+}
+
+/** End a pending invite. Returns rows changed: 0 means it was not pending. */
+export async function revoke(
+  familyId: string,
+  invitationId: string,
+  database: Db = prisma,
+): Promise<number> {
+  const result = await database.invitation.updateMany({
+    where: { id: invitationId, familyId, usedAt: null, revokedAt: null },
+    data: { revokedAt: new Date() },
+  });
+  return result.count;
+}
