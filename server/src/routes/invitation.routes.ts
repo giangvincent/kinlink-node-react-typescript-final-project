@@ -12,28 +12,31 @@ import { getFamilyInvitations } from "../controllers/invitation.controller.js";
 export const invitationRouter = Router({ mergeParams: true });
 
 invitationRouter.post("/", requireRole("owner"), async (req, res, next) => {
-  try {
-    const { userId, family, membership } = familyContext(req);
-    const { email, role } = req.body as { email?: string; role?: string };
-    if (role !== "member" && role !== "admin") {
-      res.status(400).json({ message: "role must be 'member' or 'admin'" });
-      return;
-    }
-    const result = await createInvitation({
-      familyId: family.id,
-      role,
-      inviterRole: membership.role,
-      createdBy: userId,
-      email: email ?? null,
-    });
-    res.status(201).json({ token: result.token });
-  } catch (e) {
-    if (e instanceof Error && e.message === "Insufficient role") {
-      res.status(403).json({ message: "Insufficient role" });
-      return;
-    }
-    next(e);
+  const { family, membership } = familyContext(req);
+  const { email, role } = req.body as { email?: string; role?: string };
+  if (role !== "member" && role !== "admin") {
+    res.status(400).json({ message: "role must be 'member' or 'admin'" });
+    return;
   }
+
+  const result = await createInvitation({
+    familyId: family.id,
+    inviterMembershipId: membership.id,
+    role,
+    email: email ?? null,
+  });
+
+  if (!result.ok) {
+    const status = result.reason === "duplicate-email" ? 409 : 403;
+    const message =
+      result.reason === "duplicate-email"
+        ? "A pending invitation already exists for this email"
+        : "Insufficient role";
+    res.status(status).json({ message });
+    return;
+  }
+
+  res.status(201).json({ token: result.token });
 });
 
 // Accept stands alone — the invitee is not yet a member of any family here.

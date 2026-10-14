@@ -4,7 +4,15 @@ import type { Db } from "../models/db.js";
 import { transact } from "../models/db.js";
 import { ROLES, type Role } from "../models/membership.model.js";
 import * as invitationModel from "../models/invitation.model.js";
+import * as membershipModel from "../models/membership.model.js";
 import type { Invitation } from "../models/invitation.model.js";
+
+export type CreateInvitationResult =
+  | { ok: true; token: string }
+  | {
+      ok: false;
+      reason: "not-owner" | "insufficient-role" | "duplicate-email";
+    };
 
 export type InvitationResult =
   | { ok: true }
@@ -13,6 +21,10 @@ export type InvitationResult =
 /** SHA-256 hex. Raw token sent once, only the hash stored. */
 function hashToken(token: string): string {
   return createHash("sha256").update(token).digest("hex");
+}
+
+export interface MintWindow {
+  afterDuplicateCheck?: () => Promise<void>;
 }
 
 const RANK = { member: 1, admin: 2, owner: 3 } as const satisfies Record<
@@ -24,28 +36,55 @@ const RANK = { member: 1, admin: 2, owner: 3 } as const satisfies Record<
  * Mint an invite. Granted role must be <= inviter's rank, else the role
  * system is decorative (admin mints owner, promotes self by proxy).
  */
-export async function createInvitation(input: {
-  familyId: string;
-  role: Role;
-  inviterRole: Role;
-  createdBy: string;
-  email?: string | null;
-}): Promise<{ token: string }> {
+export async function createInvitation(
+  input: {
+    familyId: string;
+    inviterMembershipId: string;
+    role: Role;
+    email?: string | null;
+  },
+  window: MintWindow = {},
+): Promise<CreateInvitationResult> {
   if (!ROLES.includes(input.role)) throw new Error("Invalid role");
-  if (RANK[input.role] > RANK[input.inviterRole])
-    throw new Error("Insufficient role");
-  const token = randomBytes(32).toString("base64url");
-  await prisma.invitation.create({
-    data: {
-      familyId: input.familyId,
-      role: input.role,
-      email: input.email ?? null,
-      tokenHash: hashToken(token),
-      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-      createdBy: input.createdBy,
-    },
+
+  return transact(async (tx) => {
+    await membershipModel.lockFamily(input.familyId, tx);
+
+    const inviter = await membershipModel.findByFamily(
+      input.familyId,
+      input.inviterMembershipId,
+      tx,
+    );
+    if (!inviter || inviter.role !== "owner") {
+      return { ok: false, reason: "not-owner" };
+    }
+    if (RANK[input.role] > RANK[inviter.role]) {
+      return { ok: false, reason: "insufficient-role" };
+    }
+
+    const email = input.email ?? null;
+    if (
+      email !== null &&
+      (await invitationModel.findPendingByEmail(input.familyId, email, tx))
+    ) {
+      return { ok: false, reason: "duplicate-email" };
+    }
+    await window.afterDuplicateCheck?.();
+
+    const token = randomBytes(32).toString("base64url");
+    await invitationModel.createInvitation(
+      {
+        familyId: input.familyId,
+        role: input.role,
+        email,
+        tokenHash: hashToken(token),
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        createdBy: inviter.userId,
+      },
+      tx,
+    );
+    return { ok: true, token };
   });
-  return { token };
 }
 
 /**
