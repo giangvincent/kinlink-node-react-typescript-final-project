@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import type { AuthResponse } from "../contracts";
 import { ApiError, getSession } from "./api";
+import { onSessionEnded } from "./session";
 
 export type SessionState =
   | { status: "loading" }
@@ -43,6 +44,11 @@ export function useSession(): { state: SessionState; refresh: () => void } {
       live = false;
     };
   }, [nonce]);
+
+  // Any request, on any screen, can be the one that discovers the session is
+  // gone. Subscribe once here so the app lands on the login screen whichever
+  // call found out -- and so no screen has to handle a 401 itself.
+  useEffect(() => onSessionEnded(() => setState({ status: "anonymous" })), []);
 
   const refresh = useCallback(() => setNonce((n) => n + 1), []);
 

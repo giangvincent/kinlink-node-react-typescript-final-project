@@ -4,6 +4,7 @@ import type {
   FamilyResource,
   InvitationResource,
 } from "../contracts";
+import { announceSessionEnded } from "./session";
 
 /**
  * A failed response, carrying the status so callers can tell "you are not logged
@@ -27,7 +28,20 @@ export class ApiError extends Error {
  */
 async function request<T>(
   path: string,
-  options: { method?: "GET" | "POST"; body?: unknown } = {},
+  options: {
+    method?: "GET" | "POST";
+    body?: unknown;
+    /**
+     * Does this request carry the caller's session?
+     *
+     * A 401 answers two different questions and the caller is the only one who
+     * knows which was asked: on a session-carrying request it means "your
+     * session is gone" -- a fact about the whole app; on a sign-in request it
+     * means "those credentials are wrong" -- a verdict on this form's input.
+     * Same status code, opposite blast radius.
+     */
+    expectsSession?: boolean;
+  } = {},
 ): Promise<T> {
   const response = await fetch(path, {
     method: options.method ?? "GET",
@@ -40,6 +54,12 @@ async function request<T>(
   });
 
   if (!response.ok) {
+    // The transport cannot tell the two 401s apart; the caller opted in above.
+    // Announcing here is what makes the fix reach every screen at once instead
+    // of each screen growing its own "Failed to load: ... 401" branch.
+    if (response.status === 401 && (options.expectsSession ?? true)) {
+      announceSessionEnded();
+    }
     throw new ApiError(
       response.status,
       `${options.method ?? "GET"} ${path} -> ${response.status}`,
@@ -64,6 +84,7 @@ export function login(input: {
   return request<AuthResponse>("/api/auth/login", {
     method: "POST",
     body: input,
+    expectsSession: false,
   });
 }
 
@@ -74,6 +95,7 @@ export function register(input: {
   return request<AuthResponse>("/api/auth/register", {
     method: "POST",
     body: input,
+    expectsSession: false,
   });
 }
 

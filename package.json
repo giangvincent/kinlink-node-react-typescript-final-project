@@ -19,7 +19,8 @@
     "check:guards": "tsx server/src/scripts/checkGuards.ts",
     "check:ownership": "tsx server/src/scripts/checkOwnership.ts",
     "check:invites": "tsx server/src/scripts/checkInvites.ts",
-    "check:families": "tsx server/src/scripts/checkFamilies.ts"
+    "check:families": "tsx server/src/scripts/checkFamilies.ts",
+    "check:session": "tsx client/src/scripts/checkSessionEnd.ts"
   },
   "dependencies": {
     "@prisma/adapter-mariadb": "^7.10.0",
