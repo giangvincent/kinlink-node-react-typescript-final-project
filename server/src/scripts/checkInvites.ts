@@ -20,6 +20,7 @@ async function main(): Promise<void> {
     const seed = async (input: {
       email: string | null;
       usedAt: Date | null;
+      revokedAt: Date | null;
       expiresAt: Date;
       createdAt: Date;
     }): Promise<void> => {
@@ -32,6 +33,7 @@ async function main(): Promise<void> {
           createdAt: input.createdAt,
           expiresAt: input.expiresAt,
           usedAt: input.usedAt,
+          revokedAt: input.revokedAt,
           createdBy: "probe",
         },
       });
@@ -41,25 +43,36 @@ async function main(): Promise<void> {
     await seed({
       email: "old@probe.invalid",
       usedAt: null,
+      revokedAt: null,
       expiresAt: future,
       createdAt: new Date(t - 2000),
     });
     await seed({
       email: null,
       usedAt: null,
+      revokedAt: null,
       expiresAt: future,
       createdAt: new Date(t - 1000),
     });
     await seed({
       email: "used@probe.invalid",
       usedAt: past,
+      revokedAt: null,
       expiresAt: future,
       createdAt: new Date(t),
     });
     await seed({
       email: "stale@probe.invalid",
       usedAt: null,
+      revokedAt: null,
       expiresAt: past,
+      createdAt: new Date(t),
+    });
+    await seed({
+      email: "revoked@probe.invalid",
+      usedAt: null,
+      revokedAt: past,
+      expiresAt: future,
       createdAt: new Date(t),
     });
 
@@ -82,6 +95,9 @@ async function main(): Promise<void> {
       emails.includes("stale@probe.invalid")
     ) {
       throw new Error("NOT PENDING: a used or expired invite was listed");
+    }
+    if (emails.includes("revoked@probe.invalid")) {
+      throw new Error("NOT PENDING: a revoked invite was listed");
     }
     if (emails[0] !== null) {
       throw new Error("ORDER WRONG: expected the newest first");

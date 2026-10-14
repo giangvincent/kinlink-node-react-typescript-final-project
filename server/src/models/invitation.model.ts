@@ -18,7 +18,12 @@ export async function findPendingByFamily(
   database: Db = prisma,
 ): Promise<Invitation[]> {
   return database.invitation.findMany({
-    where: { familyId, usedAt: null, expiresAt: { gt: new Date() } },
+    where: {
+      familyId,
+      usedAt: null,
+      revokedAt: null,
+      expiresAt: { gt: new Date() },
+    },
     orderBy: { createdAt: "desc" },
   });
 }
@@ -29,7 +34,13 @@ export async function findPendingByEmail(
   database: Db = prisma,
 ): Promise<Invitation | null> {
   return database.invitation.findFirst({
-    where: { familyId, email, usedAt: null, expiresAt: { gt: new Date() } },
+    where: {
+      familyId,
+      email,
+      usedAt: null,
+
+      expiresAt: { gt: new Date() },
+    },
   });
 }
 

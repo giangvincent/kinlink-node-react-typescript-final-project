@@ -106,6 +106,7 @@ export async function acceptInvitation(
       where: {
         tokenHash: hashToken(token),
         usedAt: null,
+        revokedAt: null,
         expiresAt: { gt: new Date() },
       },
       data: { usedAt: new Date() },

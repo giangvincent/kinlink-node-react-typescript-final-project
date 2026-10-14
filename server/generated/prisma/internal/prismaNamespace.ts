@@ -844,6 +844,7 @@ export const InvitationScalarFieldEnum = {
   tokenHash: 'tokenHash',
   expiresAt: 'expiresAt',
   usedAt: 'usedAt',
+  revokedAt: 'revokedAt',
   createdBy: 'createdBy',
   createdAt: 'createdAt'
 } as const
