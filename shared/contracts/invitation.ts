@@ -8,3 +8,8 @@ export interface InvitationResource {
   createdAt: string;
   expiresAt: string;
 }
+
+/** The raw token, returned exactly once at mint and resend. Never stored. */
+export interface CreatedInvitation {
+  token: string;
+}

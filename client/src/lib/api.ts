@@ -3,6 +3,7 @@ import type {
   AuthResponse,
   FamilyResource,
   InvitationResource,
+  CreatedInvitation,
 } from "../contracts";
 import { announceSessionEnded } from "./session";
 
@@ -106,5 +107,24 @@ export function getFamilies(): Promise<FamilyResource[]> {
 export function getInvitations(slug: string): Promise<InvitationResource[]> {
   return request<InvitationResource[]>(
     `/api/families/${encodeURIComponent(slug)}/invitations`,
+  );
+}
+
+export function acceptInvitation(token: string): Promise<void> {
+  return request<void>(`/api/invitations/${encodeURIComponent(token)}/accept`, {
+    method: "POST",
+    expectsSession: false,
+  });
+}
+
+// Add CreatedInvitation to the existing type import from "../contracts", then:
+
+export function createInvitation(
+  slug: string,
+  input: { email: string | null; role: "member" | "admin" },
+): Promise<CreatedInvitation> {
+  return request<CreatedInvitation>(
+    `/api/families/${encodeURIComponent(slug)}/invitations`,
+    { method: "POST", body: input },
   );
 }

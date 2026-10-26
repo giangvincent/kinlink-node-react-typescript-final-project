@@ -38,7 +38,7 @@ export async function findPendingByEmail(
       familyId,
       email,
       usedAt: null,
-
+      
       expiresAt: { gt: new Date() },
     },
   });

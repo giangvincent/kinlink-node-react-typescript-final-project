@@ -38,7 +38,8 @@ invitationRouter.post("/", requireRole("owner"), async (req, res, next) => {
     return;
   }
 
-  res.status(201).json({ token: result.token });
+  // mint handler:
+  res.status(201).json({ data: { token: result.token } });
 });
 
 // Accept stands alone — the invitee is not yet a member of any family here.
@@ -131,8 +132,8 @@ invitationRouter.post(
         res.status(status).json({ message });
         return;
       }
-      // Informal body: the client lesson (15e) moves this under { data: … }.
-      res.status(201).json({ token: result.token });
+      // resend handler:
+      res.status(201).json({ data: { token: result.token } });
     } catch (e) {
       next(e);
     }
