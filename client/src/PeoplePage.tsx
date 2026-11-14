@@ -3,7 +3,13 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import type { FormEvent } from "react";
 import type { Gender, PersonResource } from "./contracts";
-import { ApiError, createPerson, getPeople, updatePerson } from "./lib/api";
+import {
+  ApiError,
+  createPerson,
+  getPeople,
+  updatePerson,
+  deletePerson,
+} from "./lib/api";
 
 const GENDERS = ["male", "female", "other", "unknown"] as const;
 
@@ -83,6 +89,11 @@ function PersonRow({ slug, person }: { slug: string; person: PersonResource }) {
     },
   });
 
+  const remove = useMutation({
+    mutationFn: () => deletePerson(slug, person.id),
+    onSuccess: () => void invalidate(),
+  });
+
   if (editing) {
     return (
       <li>
@@ -118,6 +129,15 @@ function PersonRow({ slug, person }: { slug: string; person: PersonResource }) {
         }}
       >
         Edit
+      </button>
+      <button
+        type="button"
+        disabled={remove.isPending}
+        onClick={() => {
+          if (window.confirm(`Delete ${person.name}?`)) remove.mutate();
+        }}
+      >
+        Delete
       </button>
     </li>
   );

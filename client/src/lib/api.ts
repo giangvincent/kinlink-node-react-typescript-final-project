@@ -158,3 +158,10 @@ export function updatePerson(
     { method: "PATCH", body: patch },
   );
 }
+
+export function deletePerson(slug: string, personId: string): Promise<void> {
+  return request<void>(
+    `/api/families/${encodeURIComponent(slug)}/people/${encodeURIComponent(personId)}`,
+    { method: "DELETE" },
+  );
+}
