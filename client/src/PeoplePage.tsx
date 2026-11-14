@@ -1,6 +1,71 @@
-import { useQuery } from "@tanstack/react-query";
 import { Link, useParams } from "react-router-dom";
-import { ApiError, getPeople } from "./lib/api";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import type { FormEvent } from "react";
+import type { Gender } from "./contracts";
+import { ApiError, createPerson, getPeople } from "./lib/api";
+
+const GENDERS = ["male", "female", "other", "unknown"] as const;
+
+function isGender(value: unknown): value is Gender {
+  return (
+    typeof value === "string" && (GENDERS as readonly string[]).includes(value)
+  );
+}
+
+function AddPersonForm({ slug }: { slug: string }) {
+  const queryClient = useQueryClient();
+  const [name, setName] = useState("");
+  const [gender, setGender] = useState<Gender>("unknown");
+  const [error, setError] = useState<string | null>(null);
+
+  const add = useMutation({
+    mutationFn: (input: { name: string; gender: Gender }) =>
+      createPerson(slug, input),
+    onSuccess: () => {
+      setName("");
+      setError(null);
+      void queryClient.invalidateQueries({ queryKey: peopleKey(slug) });
+    },
+    onError: () => setError("That did not work. Try again."),
+  });
+
+  const submit = (event: FormEvent) => {
+    event.preventDefault();
+    const trimmed = name.trim();
+    if (trimmed === "") {
+      setError("A name is required.");
+      return;
+    }
+    add.mutate({ name: trimmed, gender });
+  };
+
+  return (
+    <form onSubmit={submit}>
+      <input
+        value={name}
+        onChange={(event) => setName(event.target.value)}
+        placeholder="Name"
+      />
+      <select
+        value={gender}
+        onChange={(event) => {
+          if (isGender(event.target.value)) setGender(event.target.value);
+        }}
+      >
+        {GENDERS.map((option) => (
+          <option key={option} value={option}>
+            {option}
+          </option>
+        ))}
+      </select>
+      <button type="submit" disabled={add.isPending}>
+        {add.isPending ? "Adding…" : "Add person"}
+      </button>
+      {error && <span role="alert"> {error}</span>}
+    </form>
+  );
+}
 
 /**
  * The key every query and mutation for one family's people shares. A mutation
@@ -27,6 +92,8 @@ function PeopleList({ slug }: { slug: string }) {
       <p>
         <Link to={`/family/${slug}/invites`}>Invitations</Link>
       </p>
+
+      <AddPersonForm slug={slug} />
 
       {query.isPending && <p>Loading…</p>}
       {query.isError && (

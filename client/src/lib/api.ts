@@ -5,6 +5,7 @@ import type {
   InvitationResource,
   CreatedInvitation,
   PersonResource,
+  CreatePersonRequest,
 } from "../contracts";
 import { announceSessionEnded } from "./session";
 
@@ -31,7 +32,7 @@ export class ApiError extends Error {
 async function request<T>(
   path: string,
   options: {
-    method?: "GET" | "POST";
+    method?: "GET" | "POST" | "PATCH" | "DELETE";
     body?: unknown;
     /**
      * Does this request carry the caller's session?
@@ -133,5 +134,15 @@ export function createInvitation(
 export function getPeople(slug: string): Promise<PersonResource[]> {
   return request<PersonResource[]>(
     `/api/families/${encodeURIComponent(slug)}/people`,
+  );
+}
+
+export function createPerson(
+  slug: string,
+  input: CreatePersonRequest,
+): Promise<PersonResource> {
+  return request<PersonResource>(
+    `/api/families/${encodeURIComponent(slug)}/people`,
+    { method: "POST", body: input },
   );
 }
