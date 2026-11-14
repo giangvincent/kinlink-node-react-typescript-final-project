@@ -6,6 +6,7 @@ import LoginScreen from "./LoginScreen";
 import type { FamilyResource } from "./contracts";
 import { getFamilies } from "./lib/api";
 import { useSession } from "./lib/useSession";
+import PeoplePage from "./PeoplePage";
 
 /**
  * The families this session belongs to. Rendered only once the session is
@@ -32,8 +33,9 @@ function FamilyList() {
       <ul>
         {families.map((family) => (
           <li key={family.slug}>
-            <Link to={`/family/${family.slug}/invites`}>{family.name}</Link> —
-            you are {family.role}
+            <Link to={`/family/${family.slug}/people`}>{family.name}</Link> —
+            you are {family.role} (
+            <Link to={`/family/${family.slug}/invites`}>invitations</Link>)
           </li>
         ))}
       </ul>
@@ -57,6 +59,7 @@ export default function App() {
       <Route path="/invite/:token" element={<AcceptPage />} />
       <Route path="/family/:slug/invites" element={<InvitesPage />} />
       <Route path="/" element={<Home />} />
+      <Route path="/family/:slug/people" element={<PeoplePage />} />
     </Routes>
   );
 }

@@ -4,6 +4,7 @@ import type {
   FamilyResource,
   InvitationResource,
   CreatedInvitation,
+  PersonResource,
 } from "../contracts";
 import { announceSessionEnded } from "./session";
 
@@ -126,5 +127,11 @@ export function createInvitation(
   return request<CreatedInvitation>(
     `/api/families/${encodeURIComponent(slug)}/invitations`,
     { method: "POST", body: input },
+  );
+}
+
+export function getPeople(slug: string): Promise<PersonResource[]> {
+  return request<PersonResource[]>(
+    `/api/families/${encodeURIComponent(slug)}/people`,
   );
 }
