@@ -6,6 +6,7 @@ import type {
   CreatedInvitation,
   PersonResource,
   CreatePersonRequest,
+  UpdatePersonRequest,
 } from "../contracts";
 import { announceSessionEnded } from "./session";
 
@@ -144,5 +145,16 @@ export function createPerson(
   return request<PersonResource>(
     `/api/families/${encodeURIComponent(slug)}/people`,
     { method: "POST", body: input },
+  );
+}
+
+export function updatePerson(
+  slug: string,
+  personId: string,
+  patch: UpdatePersonRequest,
+): Promise<PersonResource> {
+  return request<PersonResource>(
+    `/api/families/${encodeURIComponent(slug)}/people/${encodeURIComponent(personId)}`,
+    { method: "PATCH", body: patch },
   );
 }

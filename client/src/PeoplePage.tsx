@@ -2,8 +2,8 @@ import { Link, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import type { FormEvent } from "react";
-import type { Gender } from "./contracts";
-import { ApiError, createPerson, getPeople } from "./lib/api";
+import type { Gender, PersonResource } from "./contracts";
+import { ApiError, createPerson, getPeople, updatePerson } from "./lib/api";
 
 const GENDERS = ["male", "female", "other", "unknown"] as const;
 
@@ -67,6 +67,62 @@ function AddPersonForm({ slug }: { slug: string }) {
   );
 }
 
+function PersonRow({ slug, person }: { slug: string; person: PersonResource }) {
+  const queryClient = useQueryClient();
+  const [editing, setEditing] = useState(false);
+  const [name, setName] = useState(person.name);
+
+  const invalidate = () =>
+    queryClient.invalidateQueries({ queryKey: peopleKey(slug) });
+
+  const rename = useMutation({
+    mutationFn: (next: string) => updatePerson(slug, person.id, { name: next }),
+    onSuccess: () => {
+      setEditing(false);
+      void invalidate();
+    },
+  });
+
+  if (editing) {
+    return (
+      <li>
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            rename.mutate(name.trim());
+          }}
+        >
+          <input
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+          />{" "}
+          <button type="submit" disabled={rename.isPending}>
+            Save
+          </button>{" "}
+          <button type="button" onClick={() => setEditing(false)}>
+            Cancel
+          </button>
+        </form>
+      </li>
+    );
+  }
+
+  return (
+    <li>
+      {person.name} {person.living ? "· living" : "· deceased"}{" "}
+      <button
+        type="button"
+        onClick={() => {
+          setName(person.name);
+          setEditing(true);
+        }}
+      >
+        Edit
+      </button>
+    </li>
+  );
+}
+
 /**
  * The key every query and mutation for one family's people shares. A mutation
  * that invalidates this exact key is what turns "the server changed" into "the
@@ -107,9 +163,7 @@ function PeopleList({ slug }: { slug: string }) {
       {query.data && query.data.length > 0 && (
         <ul>
           {query.data.map((person) => (
-            <li key={person.id}>
-              {person.name} {person.living ? "· living" : "· deceased"}
-            </li>
+            <PersonRow key={person.id} slug={slug} person={person} />
           ))}
         </ul>
       )}
