@@ -6,3 +6,14 @@ export interface PersonResource {
   name: string;
   living: boolean;
 }
+
+/** The body of a create: every field the client may set, and nothing else. */
+export interface CreatePersonRequest {
+  name: string;
+  gender: Gender;
+  birthDate?: string | null;
+  deathDate?: string | null;
+}
+
+/** A partial edit: send only the fields that changed. */
+export type UpdatePersonRequest = Partial<CreatePersonRequest>;

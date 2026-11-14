@@ -22,7 +22,8 @@
     "check:families": "tsx server/src/scripts/checkFamilies.ts",
     "check:session": "tsx client/src/scripts/checkSessionEnd.ts",
     "check:mint": "tsx server/src/scripts/checkMint.ts",
-    "check:resend": "tsx server/src/scripts/checkResend.ts"
+    "check:resend": "tsx server/src/scripts/checkResend.ts",
+    "check:people": "tsx server/src/scripts/checkPeople.ts"
   },
   "dependencies": {
     "@prisma/adapter-mariadb": "^7.10.0",
